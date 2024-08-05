@@ -1,4 +1,5 @@
 from utils.driver_functions import *
+from utils.date import get_current_month_year
 from loguru import logger
 import time
 
@@ -19,6 +20,7 @@ class RunAnhembi:
         self.password_anhembi = password_anhembi
         self.link_anhembi = link_anhembi
         self.max_attempts = max_attempts
+        self.date = get_current_month_year()
         self.initialize_with_retry(options)
     
     def initialize_with_retry(self, options) -> None:
@@ -62,5 +64,28 @@ class RunAnhembi:
         visible_click(self.driver, By.ID, 'idSIButton9')
 
         visible_click(self.driver, By.XPATH, '/html/body/div[1]/div[2]/div[1]/div/div/div/div[2]/a[1]/div[1]')
+
+        visible_click(self.driver, By.XPATH, '/html/body/div[1]/div[2]/div[1]/div/div/div/div[2]/div[3]')
+
+        visible_click(self.driver, By.XPATH, '/html/body/div[1]/div[2]/div[1]/div/div/div/div[2]/div[3]/div/div/div')
+
+        try:
+            # Localize o elemento contendo o valor
+            element = self.driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/div[1]/div/div/div/div[2]/div[3]/div/div/div/div[1]/p[5]/strong')
+            # Extraia o texto do elemento
+            text = element.text.strip()
+            # Verifique se o texto contém o valor esperado
+            if text == self.date:
+                logger.success(f"O valor do mês e ano atual ({self.date}) foi encontrado no elemento.")
+                visible_click(self.driver, By.XPATH, '/html/body/div[1]/div[2]/div[1]/div/div/div/div[2]/div[3]/div/div/div/div[3]/span/div[2]/button[3]')
+                visible_click(self.driver, By.XPATH, '/html/body/div[1]/div[2]/div[1]/div/div/div/div[2]/div[3]/div/div[1]/div[2]/div[3]/button')
+            
+            
+            else:
+                logger.error(f"O valor do mês e ano atual ({self.date}) não foi encontrado. O texto no elemento é: {text}")
+        except Exception as e:
+            logger.error(f"Erro ao encontrar o elemento ou verificar o valor: {str(e)}")
+
+        time.sleep(99999)
         
         logger.success("Pagamento salvo com sucesso!")
