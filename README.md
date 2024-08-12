@@ -2,7 +2,7 @@
 
 ## Descrição
 
-Este projeto é uma aplicação em Python projetada para automatizar o processo de geração e envio de boletos de pagamento para alunos de uma universidade. O sistema acessa o portal do aluno da universidade na web, realiza a autenticação necessária, gera o boleto de pagamento com vencimento próximo e, em seguida, envia o boleto gerado para o e-mail do responsável pagante.
+Este projeto é uma aplicação em Python projetada para automatizar o processo de geração e envio de boletos de pagamento para alunos de uma universidade. O sistema acessa o portal do aluno da universidade na web com devidas credenciais, realiza a autenticação necessária, gera o boleto de pagamento com vencimento próximo e, em seguida, envia o boleto gerado para o e-mail do responsável pagante.
 
 ### Funcionalidades
 
