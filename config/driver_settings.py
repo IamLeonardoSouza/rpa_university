@@ -1,4 +1,5 @@
 from selenium.webdriver.chrome.options import Options
+from constants.email_credentials import *
 
 
 def driver_settings() -> Options:
@@ -22,7 +23,7 @@ def driver_settings() -> Options:
     # options.add_argument("--blink-settings=imagesEnabled=false") # Desativa o carregamento das imagens (mais desempenho)
 
     options.add_experimental_option('prefs', {
-        #"download.default_directory": download_directory,
+        "download.default_directory": directory_files,
         "download.prompt_for_download": False,
         "download.directory_upgrade": True,
         "plugins.always_open_pdf_externally": True,
