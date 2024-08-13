@@ -1,5 +1,5 @@
 from selenium.webdriver.chrome.options import Options
-from constants.email_credentials import *
+from constants.directory import *
 
 
 def driver_settings() -> Options:

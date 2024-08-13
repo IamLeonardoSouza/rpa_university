@@ -2,13 +2,13 @@ import os
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from utils.driver_functions import *
+from utils.driver_functions import visible_click, visible_keys
 from utils.date import get_current_month_year
 from loguru import logger
 
 
 class RunAnhembi:
-    def __init__(self, options: webdriver.ChromeOptions, login_anhembi: str, password_anhembi: str, link_anhembi: str, max_attempts=3) -> None:
+    def __init__(self, options: webdriver.ChromeOptions, login_anhembi: str, password_anhembi: str, link_anhembi: str, max_attempts: int = 3) -> None:
         """
         Initializes the RunAnhembi instance.
 
@@ -16,8 +16,8 @@ class RunAnhembi:
             options (webdriver.ChromeOptions): Chrome options for the webdriver.
             login_anhembi (str): Anhembi username.
             password_anhembi (str): Anhembi password.
-            link_anhembi (str): Anhembi link.
-            max_attempts (int): Maximum number of attempts for the extraction.
+            link_anhembi (str): Anhembi platform URL.
+            max_attempts (int): Maximum number of attempts for initializing the webdriver and logging in.
         """
         logger.info("Starting anhembi_web.py...")
         self.driver = None
@@ -28,12 +28,15 @@ class RunAnhembi:
         self.date = get_current_month_year()
         self.initialize_with_retry(options)
     
-    def initialize_with_retry(self, options) -> None:
+    def initialize_with_retry(self, options: webdriver.ChromeOptions) -> None:
         """
-        Initializes the Chrome webdriver with retry mechanism.
+        Initializes the Chrome webdriver with a retry mechanism.
 
         Args:
-            options: Chrome options for the webdriver.
+            options (webdriver.ChromeOptions): Chrome options for the webdriver.
+        
+        Returns:
+            None
         """
         attempts = 0
 
@@ -53,12 +56,15 @@ class RunAnhembi:
 
     def clean_data_folder(self) -> None:
         """
-        Deletes all PDF files in the 'data' folder. If no PDF files are found, continues without error.
+        Deletes all PDF files in the 'data' folder. Logs a message if the folder does not exist or if no PDF files are found.
+
+        Returns:
+            None
         """
         data_folder = os.path.join(os.getcwd(), "data")
         
         if not os.path.exists(data_folder):
-            logger.error(f"Pasta 'data' não encontrada.")
+            logger.error(f"Folder 'data' not found.")
             return
         
         pdf_found = False
@@ -67,20 +73,23 @@ class RunAnhembi:
                 file_path = os.path.join(data_folder, file_name)
                 try:
                     os.remove(file_path)
-                    logger.info(f"Arquivo {file_name} removido com sucesso.")
+                    logger.info(f"File {file_name} removed successfully.")
                     pdf_found = True
                 except Exception as e:
-                    logger.error(f"Erro ao remover o arquivo {file_name}: {str(e)}")
+                    logger.error(f"Error removing file {file_name}: {str(e)}")
         
         if not pdf_found:
             logger.info("Nenhum arquivo PDF encontrado para remoção. Seguindo com a automação...")
   
     def Anhembi_login(self) -> None:
         """
-        Performs login and file upload to Anhembi platform.
+        Performs login on the Anhembi platform and handles file upload.
 
-        Args:
-            login_Anhembi (str): Anhembi username.
+        This method cleans the 'data' folder, navigates to the Anhembi platform, and interacts with the login form using the provided credentials. 
+        It also handles specific page navigation and element interactions after login to ensure the correct month and year are selected.
+
+        Returns:
+            None
         """
         self.clean_data_folder()
         self.driver.get(self.link_anhembi)
@@ -99,16 +108,13 @@ class RunAnhembi:
             element = self.driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/div[1]/div/div/div/div[2]/div[3]/div/div/div/div[1]/p[5]/strong')
             text = element.text.strip()
             if text == self.date:
-                logger.success(f"O valor do mês e ano atual ({self.date}) foi encontrado no elemento.")
+                logger.success(f"The current month and year value ({self.date}) was found in the element.")
                 visible_click(self.driver, By.XPATH, '/html/body/div[1]/div[2]/div[1]/div/div/div/div[2]/div[3]/div/div/div/div[3]/span/div[2]/button[3]')
                 visible_click(self.driver, By.XPATH, '/html/body/div[1]/div[2]/div[1]/div/div/div/div[2]/div[3]/div/div[1]/div[2]/div[3]/button')
-
             else:
-                logger.error(f"O valor do mês e ano atual ({self.date}) não foi encontrado. O texto no elemento é: {text}")
+                logger.error(f"The current month and year value ({self.date}) was not found. The text in the element is: {text}")
         except Exception as e:
-            logger.error(f"Erro ao encontrar o elemento ou verificar o valor: {str(e)}")
+            logger.error(f"Error finding element or checking value: {str(e)}")
         
         time.sleep(5)
-
-        logger.success("Pagamento salvo com sucesso!")
-    
+        logger.success("Payment saved successfully!")
